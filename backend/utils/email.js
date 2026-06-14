@@ -43,17 +43,29 @@ const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || process.env.BREVO_SMTP_USER;
 // ─── Core send function ───────────────────────────────────────────────────────
 const sendEmail = async ({ to, subject, html }) => {
   try {
+    console.log('=== EMAIL DEBUG START ===');
+    console.log('TO:', to);
+    console.log('SMTP USER:', process.env.BREVO_SMTP_USER);
+    console.log('FROM EMAIL:', FROM_EMAIL);
+
     const transporter = createTransporter();
+
+    await transporter.verify();
+    console.log('SMTP connection successful');
+
     const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
       subject,
       html
     });
-    console.log(`[Email] Sent to ${to} — messageId: ${info.messageId}`);
+
+    console.log('[Email] Sent successfully');
+    console.log('Message ID:', info.messageId);
+
     return { success: true, messageId: info.messageId };
   } catch (err) {
-    console.error('[Email] Send error:', err.message);
+    console.error('EMAIL ERROR:', err);
     return { success: false, error: err.message };
   }
 };
