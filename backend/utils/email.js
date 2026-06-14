@@ -25,15 +25,27 @@ const nodemailer = require('nodemailer');
 const createTransporter = () =>
   nodemailer.createTransport({
     host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // STARTTLS on port 587
+
+    // Try port 2525 first
+    port: 2525,
+    secure: false,
+    requireTLS: true,
+
     auth: {
-      user: process.env.BREVO_SMTP_USER, // your Brevo account email
-      pass: process.env.BREVO_SMTP_KEY   // SMTP key from Brevo dashboard
+      user: process.env.BREVO_SMTP_USER,
+      pass: process.env.BREVO_SMTP_KEY
     },
-    connectionTimeout: 8000,
-    greetingTimeout:   8000,
-    socketTimeout:     15000
+
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+
+    tls: {
+      rejectUnauthorized: false
+    },
+
+    logger: true,
+    debug: true
   });
 
 // Sender identity — use a verified sender from Brevo dashboard
@@ -50,8 +62,13 @@ const sendEmail = async ({ to, subject, html }) => {
 
     const transporter = createTransporter();
 
+    console.log('=== SMTP VERIFY START ===');
+    console.log('HOST:', 'smtp-relay.brevo.com');
+    console.log('PORT:', 2525);
+
     await transporter.verify();
-    console.log('SMTP connection successful');
+
+    console.log('=== SMTP VERIFIED SUCCESSFULLY ===');
 
     const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
