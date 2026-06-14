@@ -1,0 +1,14 @@
+{
+  "name": "brainlink",
+  "version": "1.0.0",
+  "description": "Full-stack BrainLink with subscriptions, Q&A, social, rewards, multilingual support",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "setup": "cp backend/.env.example backend/.env && cp frontend/.env.example frontend/.env && echo 'Created .env files — please fill in your credentials'"
+  },
+  "keywords": ["mern", "mongodb", "express", "react", "nodejs"],
+  "author": ""
+}
