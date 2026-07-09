@@ -1,22 +1,3 @@
-// Generate 6-digit OTP
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-// Generate random password with only upper/lowercase letters (no numbers/special chars)
-const generatePassword = (length = 10) => {
-  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const lower = 'abcdefghijklmnopqrstuvwxyz';
-  const all = upper + lower;
-  let password = '';
-  // Ensure at least one uppercase and one lowercase
-  password += upper[Math.floor(Math.random() * upper.length)];
-  password += lower[Math.floor(Math.random() * lower.length)];
-  for (let i = 2; i < length; i++) {
-    password += all[Math.floor(Math.random() * all.length)];
-  }
-  // Shuffle
-  return password.split('').sort(() => Math.random() - 0.5).join('');
-};
-
 // Check if current time is within IST window (10:00 AM - 11:00 AM)
 const isPaymentTimeAllowed = () => {
   const now = new Date();
@@ -77,8 +58,6 @@ const generateInvoiceNumber = () => {
 };
 
 module.exports = {
-  generateOTP,
-  generatePassword,
   isPaymentTimeAllowed,
   isMobileLoginAllowed,
   parseUserAgent,

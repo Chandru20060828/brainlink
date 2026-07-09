@@ -12,7 +12,6 @@ const startCronJobs = () => {
           $set: {
             'subscription.questionsPostedToday': 0,
             'subscription.lastResetDate': new Date(),
-            forgotPasswordUsedToday: false,
             socialPostsToday: 0,
             socialPostsLastReset: new Date()
           }
@@ -40,18 +39,6 @@ const startCronJobs = () => {
       }
     } catch (err) {
       console.error('[CRON] Error checking subscriptions:', err.message);
-    }
-  });
-
-  // Cleanup expired OTPs every 15 minutes
-  cron.schedule('*/15 * * * *', async () => {
-    try {
-      await User.updateMany(
-        { otpExpiry: { $lt: new Date() }, otp: { $exists: true } },
-        { $unset: { otp: 1, otpExpiry: 1, otpPurpose: 1 } }
-      );
-    } catch (err) {
-      console.error('[CRON] OTP cleanup error:', err.message);
     }
   });
 

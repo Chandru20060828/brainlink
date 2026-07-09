@@ -42,9 +42,6 @@ const Profile = () => {
   const [transferTo, setTransferTo] = useState('');
   const [transferToName, setTransferToName] = useState('');
   const [transferPoints, setTransferPoints] = useState('');
-  const [langOtpStep, setLangOtpStep] = useState(false);
-  const [pendingLang, setPendingLang] = useState('');
-  const [langOtp, setLangOtp] = useState('');
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -101,27 +98,17 @@ const Profile = () => {
     finally { setLoading(false); }
   };
 
-  const requestLangChange = async (lang) => {
+  const changeLanguage = async (lang) => {
     if (lang === user?.language) return;
-    setPendingLang(lang); setMsg(''); setError('');
+    setMsg(''); setError('');
     try {
-      const res = await api.post('/auth/request-language-change', { language: lang });
-      setLangOtpStep(true);
-      setMsg(res.data.message);
-    } catch (err) { setError(err.response?.data?.message || t('transferFailed')); }
-  };
-
-  const verifyLangOtp = async (e) => {
-    e.preventDefault(); setMsg(''); setError('');
-    try {
-      await api.post('/auth/verify-language-change', { otp: langOtp, language: pendingLang });
-      i18n.changeLanguage(pendingLang);
-      localStorage.setItem('appLanguage', pendingLang);
-      updateUser({ language: pendingLang });
-      setLangOtpStep(false); setLangOtp('');
-      const langName = LANGUAGES.find(l => l.code === pendingLang)?.name;
+      await api.post('/auth/update-language', { language: lang });
+      i18n.changeLanguage(lang);
+      localStorage.setItem('appLanguage', lang);
+      updateUser({ language: lang });
+      const langName = LANGUAGES.find(l => l.code === lang)?.name;
       setMsg(`${t('languageChanged')} ${langName}`);
-    } catch (err) { setError(err.response?.data?.message || t('invalidOtp')); }
+    } catch (err) { setError(err.response?.data?.message || t('transferFailed')); }
   };
 
   const deviceIcon = (d) => d === 'mobile' ? '📱' : d === 'tablet' ? '📟' : '💻';
@@ -377,43 +364,20 @@ const Profile = () => {
       {tab === 'language' && (
         <div className="card">
           <div className="card-title">🌍 {t('languageSettings')}</div>
-          <div className="alert alert-info" style={{ margin: '12px 0' }}>
-            🔒 {t('langOtpNotice')}
-          </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: 16 }}>
             {t('currentLanguage')}: <strong>{LANGUAGES.find(l => l.code === user.language)?.name || 'English 🇬🇧'}</strong>
           </p>
 
-          {!langOtpStep ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
-              {LANGUAGES.map(lang => (
-                <button key={lang.code}
-                  className={`btn${user.language === lang.code ? ' btn-primary' : ' btn-outline'}`}
-                  onClick={() => requestLangChange(lang.code)}
-                  style={{ justifyContent: 'flex-start' }}>
-                  {lang.name} {user.language === lang.code && '✓'}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <form onSubmit={verifyLangOtp}>
-              <div className="alert alert-warning">
-                {t('otpSent')} {pendingLang === 'fr' ? t('checkEmailOtp') : t('checkMobileOtp')}
-              </div>
-              <div className="form-group">
-                <label className="form-label">{t('enterOtp')}</label>
-                <input className="form-control" value={langOtp}
-                  onChange={e => setLangOtp(e.target.value)} required maxLength={6}
-                  placeholder={t('otpPlaceholder')}
-                  style={{ letterSpacing: 4, textAlign: 'center', fontSize: '1.2rem' }} />
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button className="btn btn-primary">{t('verifyAndChange')}</button>
-                <button type="button" className="btn btn-outline"
-                  onClick={() => { setLangOtpStep(false); setLangOtp(''); }}>{t('cancel')}</button>
-              </div>
-            </form>
-          )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+            {LANGUAGES.map(lang => (
+              <button key={lang.code}
+                className={`btn${user.language === lang.code ? ' btn-primary' : ' btn-outline'}`}
+                onClick={() => changeLanguage(lang.code)}
+                style={{ justifyContent: 'flex-start' }}>
+                {lang.name} {user.language === lang.code && '✓'}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

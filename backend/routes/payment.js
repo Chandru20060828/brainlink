@@ -6,7 +6,6 @@ const auth = require('../middleware/auth');
 const Payment = require('../models/Payment');
 const User = require('../models/User');
 const { isPaymentTimeAllowed, generateInvoiceNumber } = require('../utils/helpers');
-const { sendInvoiceEmail } = require('../utils/email');
 
 const PLANS = {
   bronze: { amount: 10000, name: 'Bronze Plan' }, // ₹100 in paise
@@ -92,9 +91,6 @@ router.post('/verify', auth, async (req, res) => {
       'subscription.plan': payment.plan,
       'subscription.expiresAt': expiresAt
     });
-
-    const user = await User.findById(req.user._id);
-    await sendInvoiceEmail(user, payment);
 
     res.json({ message: 'Payment successful! Subscription activated.', plan: payment.plan });
   } catch (err) {

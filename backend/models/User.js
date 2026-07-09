@@ -25,13 +25,8 @@ const userSchema = new mongoose.Schema({
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   loginHistory: [loginHistorySchema],
-  forgotPasswordUsedToday: { type: Boolean, default: false },
-  forgotPasswordLastDate: { type: Date },
   socialPostsToday: { type: Number, default: 0 },
   socialPostsLastReset: { type: Date, default: Date.now },
-  otp: { type: String },
-  otpExpiry: { type: Date },
-  otpPurpose: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

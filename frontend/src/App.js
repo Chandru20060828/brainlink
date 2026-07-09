@@ -7,7 +7,6 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
 import Questions from './pages/Questions';
 import QuestionDetail from './pages/QuestionDetail';
 import Social from './pages/Social';
@@ -29,7 +28,6 @@ function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/questions" element={<Questions />} />
         <Route path="/questions/:id" element={<QuestionDetail />} />
         <Route path="/social" element={<ProtectedRoute><Social /></ProtectedRoute>} />

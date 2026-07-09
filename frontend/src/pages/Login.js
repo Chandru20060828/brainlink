@@ -6,10 +6,6 @@ import { useTranslation } from 'react-i18next';
 
 const Login = () => {
   const [form, setForm]       = useState({ email: '', password: '' });
-  const [step, setStep]       = useState('login');
-  const [otp, setOtp]         = useState('');
-  const [userId, setUserId]   = useState('');
-  const [msg, setMsg]         = useState('');
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
   const [noAccount, setNoAccount] = useState(false);
@@ -19,17 +15,11 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); setError(''); setMsg(''); setNoAccount(false);
+    setLoading(true); setError(''); setNoAccount(false);
     try {
       const res = await api.post('/auth/login', form);
-      if (res.data.requireOTP) {
-        setUserId(res.data.userId);
-        setStep('otp');
-        setMsg(res.data.message);
-      } else {
-        login(res.data.token, res.data.user);
-        navigate('/');
-      }
+      login(res.data.token, res.data.user);
+      navigate('/');
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
       setError(msg);
@@ -37,20 +27,6 @@ const Login = () => {
       if (msg.toLowerCase().includes('no account') || msg.toLowerCase().includes('not found')) {
         setNoAccount(true);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOTP = async (e) => {
-    e.preventDefault();
-    setLoading(true); setError('');
-    try {
-      const res = await api.post('/auth/verify-login-otp', { userId, otp });
-      login(res.data.token, res.data.user);
-      navigate('/');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Invalid OTP. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -80,8 +56,6 @@ const Login = () => {
         </div>
 
         <div className="card" style={{ animation: 'fadeUp 0.5s 0.1s both', padding: '32px 28px' }}>
-          {msg && <div className="alert alert-info">{msg}</div>}
-
           {error && (
             <div className="alert alert-danger" style={{ marginBottom: 16 }}>
               ⚠️ {error}
@@ -96,92 +70,42 @@ const Login = () => {
             </div>
           )}
 
-          {step === 'login' ? (
-            <form onSubmit={handleLogin} autoComplete="on">
-              <div className="form-group">
-                <label className="form-label">{t('email')}</label>
-                <input
-                  className="form-control"
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={e => setForm({ ...form, email: e.target.value })}
-                  required
-                  placeholder={t('emailPlaceholder')}
-                  autoComplete="username"
-                  autoFocus
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">{t('password')}</label>
-                <input
-                  className="form-control"
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={e => setForm({ ...form, password: e.target.value })}
-                  required
-                  placeholder={t('passwordPlaceholder')}
-                  autoComplete="current-password"
-                />
-              </div>
-              <div style={{ textAlign: 'right', marginBottom: 20 }}>
-                <Link to="/forgot-password" style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                  {t('forgotPassword')}
-                </Link>
-              </div>
-              <button
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '12px' }}
-                disabled={loading}
-              >
-                {loading ? <><span className="spinner"></span> {t('signingIn')}</> : t('signIn')}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleOTP} autoComplete="off">
-              <div className="alert alert-info" style={{ textAlign: 'center', marginBottom: 20 }}>
-                🔒 Chrome security: An OTP was sent to <strong>{form.email}</strong>
-              </div>
-              <div className="form-group" style={{ textAlign: 'center' }}>
-                <label className="form-label">{t('enterOtp')}</label>
-                <input
-                  className="form-control"
-                  type="text"
-                  name="otp"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  required
-                  placeholder="• • • • • •"
-                  maxLength={6}
-                  autoComplete="one-time-code"
-                  style={{
-                    letterSpacing: '10px', fontSize: '1.5rem', textAlign: 'center',
-                    fontFamily: 'monospace', padding: '14px'
-                  }}
-                  autoFocus
-                />
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 8 }}>
-                  Check your inbox at <strong>{form.email}</strong>. OTP valid for 10 minutes.
-                </p>
-              </div>
-              <button
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '12px' }}
-                disabled={loading || otp.length !== 6}
-              >
-                {loading ? <><span className="spinner"></span> Verifying…</> : 'Verify OTP & Login'}
-              </button>
-              <button
-                type="button"
-                className="btn btn-outline"
-                style={{ width: '100%', marginTop: 10 }}
-                onClick={() => { setStep('login'); setOtp(''); setError(''); }}
-              >
-                ← Back to Login
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleLogin} autoComplete="on">
+            <div className="form-group">
+              <label className="form-label">{t('email')}</label>
+              <input
+                className="form-control"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                required
+                placeholder={t('emailPlaceholder')}
+                autoComplete="username"
+                autoFocus
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">{t('password')}</label>
+              <input
+                className="form-control"
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                required
+                placeholder={t('passwordPlaceholder')}
+                autoComplete="current-password"
+              />
+            </div>
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '12px' }}
+              disabled={loading}
+            >
+              {loading ? <><span className="spinner"></span> {t('signingIn')}</> : t('signIn')}
+            </button>
+          </form>
 
           <div className="divider" style={{ margin: '24px 0 18px' }} />
           <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
